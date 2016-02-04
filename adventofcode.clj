@@ -170,3 +170,24 @@
                      (calc-surface-area l w h)))))
           []
           (line-seq rdr)))
+
+(let [[s q] (sort [1 2 3])]
+        s)
+
+(defn calc-surface-area
+  [l w h]
+  (+ (* 2 (* l w)) (* 2 (* w h)) (* 2 (* h l)) 
+     (let [[s q] (sort [l w h])]
+        (* s q))))
+ 
+(with-open [rdr (clojure.java.io/reader "./input_day_2.txt")]
+  (reduce (fn [final-array elem]
+            (conj final-array
+                  (let [[l w h] (into [] (map read-string (into [] (re-seq #"\d+" elem))))]
+                    (calc-surface-area l w h))))
+          []
+          (line-seq rdr)))
+
+
+(let [[l w h] (into [] (map read-string (into [] (re-seq #"\d+" elem))))]
+                     (calc-surface-area l w h))
