@@ -180,14 +180,76 @@
      (let [[s q] (sort [l w h])]
         (* s q))))
  
-(with-open [rdr (clojure.java.io/reader "./input_day_2.txt")]
-  (reduce (fn [final-array elem]
-            (conj final-array
-                  (let [[l w h] (into [] (map read-string (into [] (re-seq #"\d+" elem))))]
-                    (calc-surface-area l w h))))
-          []
-          (line-seq rdr)))
+(reduce + (with-open [rdr (clojure.java.io/reader "./input_day_2.txt")]
+            (reduce (fn [final-array elem]
+                      (conj final-array
+                            (let [[l w h] (into [] (map read-string (into [] (re-seq #"\d+" elem))))]
+                              (calc-surface-area l w h))))
+                    []
+                    (line-seq rdr))))
 
 
 (let [[l w h] (into [] (map read-string (into [] (re-seq #"\d+" elem))))]
                      (calc-surface-area l w h))
+
+()
+
+
+(defn calc-ribbon-feet
+  [l w h]
+(+ (* l w h) (let [[s q] (sort [l w h])]
+        (* 2 (+ s q)))))
+
+
+
+(reduce + (with-open [rdr (clojure.java.io/reader "./input_day_2.txt")]
+            (reduce (fn [final-array elem]
+                      (conj final-array
+                            (let [[l w h] (into [] (map read-string (into [] (re-seq #"\d+" elem))))]
+                              (calc-ribbon-feet l w h))))
+                    []
+                    (line-seq rdr))))
+
+(let [[s q] (sort [4 3 3])]
+        (* 2 (+ s q)))
+
+(defn day-3-first-part
+  [x]
+  x)
+
+(def a (hash-map [:0 :0] 1))
+(update-in a [[:0 :0]] inc)
+(update a [:0 :0] (fnil inc 0))
+
+
+(update {[] :a 1, :b 1} :b (fnil inc 0))
+(defn add-position
+  "insert a new present to the next house"  
+  [x y map]
+())
+
+
+(defn move
+  [sym]
+  (match [sym]
+         ["^"] (seq [0 1])
+         ["<"] (seq [-1 0])
+         ["v"] (seq [0 -1])
+         [">"] (seq [1 0])))
+
+(defn next
+  [[c1 c2] [m1 m2]]
+    (seq [(+ c1 m1) (+ c2 m2)]))
+
+
+
+(defn give
+  [houses next]  
+  (let [[x y] next] (update houses [(keyword (Integer/toString x)) (keyword (Integer/toString y))] (fnil inc 0)))
+)
+
+(loop [movements ["<" "v" ">" "^"] houses {} current (seq [0 0])]
+  (if (empty? movements)
+    houses
+    (let [[part & remaining] movements n (ne current (move part))]
+      (recur remaining (give houses n) n))))
