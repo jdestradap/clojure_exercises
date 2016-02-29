@@ -234,13 +234,13 @@
 (defn move
   [sym]
   (match [sym]
-         [\^] (seq [0 1])
-         [\<] (seq [-1 0])
-         [\v] (seq [0 -1])
-         [\>] (seq [1 0])
-         [_]  (seq [0 0])))
+         [\^] '(0 1)
+         [\<] '(-1 0)
+         [\v] '(0 -1)
+         [\>] '(1 0)
+         [_]  '(0 0)))
 
-(defn ne
+(defn next-move
   [[c1 c2] [m1 m2]]
     (seq [(+ c1 m1) (+ c2 m2)]))
 
@@ -251,11 +251,33 @@
 
 (defn houses-with-presents
   [m]
-  (loop [movements m houses {} current (seq [0 0])]
+  (loop [movements m houses {} santa-current '(0 0)]
     (if (empty? movements)
       houses
-      (let [[part & remaining] movements n (ne current (move part))]
-        (recur remaining (give houses n) n)))))
-
+      (let [[part & remaining] movements n (next-move santa-current (move part))]
+        (recur remaining (give-present houses n) n)))))
 
 (count (houses-with-presents (seq (char-array(clojure.string/trim-newline(slurp "/Users/jdestradap/projects/clojure-hello-world/clojure-noob/src/clojure_noob/input_day_3.txt"))))))
+
+(defn compound-key
+  [sequence]
+  (let [[x y] sequence] [(keyword (Integer/toString x)) (keyword (Integer/toString y))]))
+
+(defn update-coordenates
+  [key-houses sequence-points]
+  (if (empty? key-houses)
+    sequence-points
+    (let [[part & remaining] key-houses sq (update sequence-points part (fnil inc 0))]
+      (update-coordenates remaining sq))))
+
+(defn cross-array
+  [movements houses santa-current robot-santa-current]
+  (if (empty? movements)
+    houses
+    (let [[santa-part robot-santa-part & remaining] movements
+          next-move-santa (next-move santa-current (move santa-part))
+          next-move-robot-santa (next-move robot-santa-current (move robot-santa-part))
+          h (update-coordenates [(compound-key next-move-santa) (compound-key next-move-robot-santa)] houses)]
+      (cross-array remaining h next-move-santa next-move-robot-santa))))
+
+(count (cross-array (seq (char-array(clojure.string/trim-newline(slurp "/Users/jdestradap/projects/clojure-hello-world/clojure-noob/src/clojure_noob/input_day_3.txt.cp")))) {} '(0 0) '(0 0)))
