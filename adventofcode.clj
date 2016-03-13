@@ -106,3 +106,13 @@
       (cross-array remaining h next-move-santa next-move-robot-santa))))
 
 (count (cross-array (seq (char-array(clojure.string/trim-newline(slurp "/Users/jdestradap/projects/clojure-hello-world/clojure-noob/src/clojure_noob/input_day_3.txt.cp")))) {} '(0 0) '(0 0)))
+
+;;Day 4
+;;First part
+
+(defn calc-number
+  [s number]
+  (let [hs (md5 (str s number))]
+    (if (= (compare (subs hs 0 5) "00000") 0)
+                     number
+                     (recur s (inc number)))))
